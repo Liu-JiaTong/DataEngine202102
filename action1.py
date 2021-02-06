@@ -22,7 +22,7 @@ def creat_bs(url, headers,):
 #         headers: 请求头
 def car_complain_spider(url, headers, data_save_file='csv_out.csv'):
     csv_header = []
-    # 用于存取获取到的数据
+    # 用于存取每页获取到的数据
     csv_data = []
     # 临时存储表格单行信息
     table_row_data = []
@@ -57,13 +57,17 @@ def car_complain_spider(url, headers, data_save_file='csv_out.csv'):
             csv_data.append(table_row_data.copy())
             # 清空一行的缓存信息
             table_row_data.clear()
+        # 创建Pandas DataFrame
+        data_out = pd.DataFrame(csv_data)
+        # 保存信息到csv(第一页数据将所有原始覆盖，后面追加)
+        if page > 1 :
+            data_out.to_csv(data_save_file, mode='a', index=False, header=False, encoding='utf_8_sig')
+        else:
+            data_out.to_csv(data_save_file, mode='w', index=False, header=False, encoding='utf_8_sig')
+        # 当前页的临时数据清空
+        csv_data.clear()
         print("搜索第" + str(page) + "页完成")
     print("全部搜索完成")
-    # 创建Pandas DataFrame
-    data_out = pd.DataFrame(csv_data)
-    # 保存信息到csv
-    data_out.to_csv(data_save_file, index=False, header=False, encoding='utf_8_sig')
-    print("数据保存完成")
 
 
 if __name__ == '__main__':
